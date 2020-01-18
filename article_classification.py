@@ -10,26 +10,25 @@ from google.cloud.vision import types
 
 class clothes:
     def __init__(self):
-        # self.labels = labels
-        # self.properties = properties
         pass
     def categorization(self,labels):        #Clothing Categories should iterate thru a dict like a list 
         # print('Labels:')
         Tops = {'T-shirt','shirt','sleeve'}
         Outerwear = {'Outerwear', 'Jacket', 'Sweater'}
-        Pants = {'Pants','Leg','Trousers'}
+        Bottoms = {'Pants','Leg','Trousers','Skirt','Short'}
+        Shoes = {'Footwear','Shoe','Shoes','Boots','Heels'}
+
         for label in labels:
             # print(label.description)
-            # if label.description in Tops: #if 'shirt' in label.description? 
+            # category = ''
             if label.description in Tops:
                 category = 'Tops'
-                break
             elif label.description in Outerwear:
                 category = 'Outerwear'
-                break
-            elif label.description in Pants:
-                category = 'Pants'
-                break
+            elif label.description in Bottoms:
+                category = 'Bottoms'
+            elif label.description in Shoes:
+                category = 'Shoes'
         # print('CAT',category)
         return category
 
@@ -116,7 +115,7 @@ class clothes:
 if __name__ == "__main__":
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r'ServiceAccToken.json'
 
-    FILE_NAME = 'polo_shirt_PNG8171.png'
+    FILE_NAME = 'timbs.png'
     # FILE_NAME = 'goods_31_420664.jpg' #badd
     # FILE_NAME = '25543_BCW.jpg'
     # FILE_NAME = 'lulu.jpeg' #don't use 
