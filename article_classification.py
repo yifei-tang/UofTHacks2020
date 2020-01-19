@@ -1,12 +1,7 @@
-import os, io
-import webcolors
-import bokeh
+import os, io, webcolors, bokeh
 from bokeh.colors import groups as grps
 from google.cloud import vision 
 from google.cloud.vision import types
-
-# Properties (colours), Labels/Web (what it is), Safe Search (appropriate clothing?)
-# Database of your current wardrobe 
 
 class clothes:
     def __init__(self):
@@ -33,11 +28,9 @@ class clothes:
         return category
 
     def colour_seen(self,properties):
-        colors = [(int(color.color.red),int(color.color.green),int(color.color.blue),color.pixel_fraction) for color in props.dominant_colors.colors] #triplets
-        # print(colors)
+        colors = [(int(color.color.red),int(color.color.green),int(color.color.blue),color.pixel_fraction) for color in properties.dominant_colors.colors] 
         colors.sort(key=lambda x:x[3], reverse = True)
-        # print(colors)
-        # print(webcolors.rgb_to_name((0,0,0)))
+
         for color in colors[0:2]:
             try:
                 closest_name = actual_name = (webcolors.rgb_to_name(color[0:3]))
@@ -51,9 +44,6 @@ class clothes:
                     if color[3]*(r_dist+g_dist+b_dist) < min_color:
                         min_color = color[3]*(r_dist+g_dist+b_dist)
                         closest_name = name 
-                        # print(closest_name)
-    
-        # print('fdas',closest_name)
         return self.colour_group_mapping(closest_name)
     
     def colour_group_mapping(self,closest_name):
@@ -92,55 +82,51 @@ class clothes:
             color_grp = 'red'
         elif closest_name in grps.purple._colors:
             color_grp = 'purple'
-        # print(color_grp) 
         return color_grp
 
     def complementary(self,group):
-        print(group)
         complements = {
-            'black': 'yellow',
-            'blue':'yellow',
-            'brown':'blue',
-            'cyan':'red',
-            'green':'brown',
-            'orange':'blue',
-            'pink':'red',
-            'purple':'yellow',
-            'red':'cyan',
-            'white':'red',
-            'yellow':'blue',
+            'black': ['black','blue','brown','cyan','green','orange','pink','purple','red','white','yellow'],
+            'blue': ['black','white','purple','orange'],
+            'brown':['black','white','blue'],
+            'cyan':['red','white','black','purple'],
+            'green':['black','white','purple','brown'],
+            'orange':['black','white','brown'],
+            'pink':['black','white','purple'],
+            'purple':['black','white','pink'],
+            'red':['black','white','cyan','blue'],
+            'white':['black','blue','brown','cyan','green','orange','pink','purple','red','yellow'],
+            'yellow':['black','white','blue'],
         }
         return complements[group]
 
-if __name__ == "__main__":
+# Call the following function 
+def article_class(url):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r'ServiceAccToken.json'
 
-    FILE_NAME = 'timbs.png'
+    # FILE_NAME = 'timbs.png'
     # FILE_NAME = 'goods_31_420664.jpg' #badd
     # FILE_NAME = '25543_BCW.jpg'
     # FILE_NAME = 'lulu.jpeg' #don't use 
     # FILE_NAME = 'Womens-CBC74-WB-tshirt-416x416.jpg'
+    # FOLDER_PATH = r'/home/trudie/Desktop/UofTHacks2020/Images'
 
-    FOLDER_PATH = r'/home/trudie/Desktop/UofTHacks2020/Images'
-
-    with io.open(os.path.join(FOLDER_PATH,FILE_NAME), 'rb') as image_file:
-        content = image_file.read()
-
-    image = vision.types.Image(content = content)
     client = vision.ImageAnnotatorClient()
-    # print(client)
-    #Labels 
-    response_lbl = client.label_detection(image=image)
-    labels = response_lbl.label_annotations
 
-    #Properties (Colours)
-    response_clr = client.image_properties(image=image)
-    props = response_clr.image_properties_annotation
-    
+    request = {
+        'source' : {'image_uri':url},
+    }
+
+    response_lbl = client.label_detection(request)
+    response_clr = client.image_properties(request)
+    labels = response_lbl.label_annotations    #Labels 
+    props = response_clr.image_properties_annotation    #Properties (Colours)
+
     article = clothes()
-    print(article.categorization(labels))
-    # print('fhsad',article.colour_seen(props))
     group = article.colour_seen(props)
-    # print(group)
-    print('complement:',article.complementary(group))
 
+    return article.categorization(labels), article.complementary(group)    #type, recommend colours [str]
+
+# Testing 
+# url = "https://images.footlocker.com/is/image/EBFL2/55045000_a1?wid=640&hei=640&fmt=png-alpha" 
+# print(article_class(url))
