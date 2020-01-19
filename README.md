@@ -2,7 +2,7 @@
 
 company_name: 
 
- - sex: "male", "female", "unisex"
+ - sex: "men", "women", "unisex"
 
  - colour: "cyan", "pink", "red", "orange", "yellow", "black", "white", "brown", "green", "purple", "blue"???
 
