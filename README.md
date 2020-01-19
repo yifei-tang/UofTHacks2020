@@ -4,7 +4,7 @@ company_name:
 
  - sex: "male", "female", "unisex"
 
- - colour: "cyan", "pink", "red", "orange", "yellow", "black", "white", "brown", "green", "purple", 
+ - colour: "cyan", "pink", "red", "orange", "yellow", "black", "white", "brown", "green", "purple", "blue"???
 
  - type: "top", "bottom", "outerwear", "shoes"
 
